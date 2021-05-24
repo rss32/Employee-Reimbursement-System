@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="static/css/style.css" />
+
+
+<style>
+div {
+	margin-left: 10%;
+	width: 50%;
+}
+
+a {
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius: 3px;
+}
+
+input {
+	border: none;
+}
+
+#cancel-button, #submit-button {
+	visibility: hidden;
+}
+</style>
+</head>
+<body>
+
+	<h3>User Profile</h3>
+	<br>
+
+	<div>
+		<button class="primary-button" id="edit-button">Edit &#9998;</button>
+		<p id="message"></p>
+		<label>Username: </label> <br /> <input type="text" id="username"
+			placeholder="" readonly> <br /> <br /> <label>First
+			Name: </label> <br /> <input type="text" id="fname" placeholder="" readonly>
+		<br /> <br /> <label>Last Name: </label> <br> <input
+			type="text" id="lname" placeholder="" readonly> <br /> <br />
+		<label>Email: </label> <br> <input type="text" id="email"
+			placeholder="" readonly> <br /> <br />
+
+
+		<button type='submit' class="secondary-button" id="cancel-button">Cancel</button>
+		<span>&nbsp;</span>
+
+		<button type='submit' class="primary-button" id="submit-button">Update
+			profile</button>
+	</div>
+	<br>
+	<div>
+		<hr>
+		<a href="http://localhost:8080/Project1/home">&#10094; Return home</a>
+	</div>
+	<script>
+		let username;
+		let fname;
+		let lname;
+		let email;
+
+		let editButton = document.getElementById("edit-button");
+		let submitButton = document.getElementById("submit-button");
+		let cancelButton = document.getElementById("cancel-button");
+		editButton.addEventListener("click", editUser);
+		submitButton.addEventListener("click", updateUser);
+		cancelButton.addEventListener("click", resetForm);
+
+		let xhr = new XMLHttpRequest();
+		let url = "http://localhost:8080/Project1/api/user"
+		xhr.open("GET", url);
+		xhr.send();
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				let response = xhr.responseText;
+				response = JSON.parse(response);
+				populateUserInfo(response);
+			} else {
+				username = "null";
+				fname = "null";
+				lname = "null";
+				email = "null";
+			}
+		}
+
+		function populateUserInfo(response) {
+			username = response.username;
+			fname = response.firstName;
+			lname = response.lastName;
+			email = response.email;
+
+			document.getElementById("username").value = username;
+			document.getElementById("fname").value = fname;
+			document.getElementById("lname").value = lname;
+			document.getElementById("email").value = email;
+		}
+
+		function editUser() {
+			editButton.style.visibility = "hidden";
+			submitButton.style.visibility = "visible";
+			cancelButton.style.visibility = "visible";
+			
+			document.getElementById("fname").style.border = "revert";
+			document.getElementById("lname").style.border = "revert";
+			document.getElementById("email").style.border = "revert";
+			document.getElementById("fname").readOnly = false;
+			document.getElementById("lname").readOnly = false;
+			document.getElementById("email").readOnly = false;
+
+		}
+		function updateUser() {
+			
+			let newFname = document.getElementById("fname").value;
+			let newLname = document.getElementById("lname").value;
+			let newEmail = document.getElementById("email").value;
+			
+			
+			let p = document.getElementById("message");
+			p.innerHTML = "";
+			p.style.color = "red";
+
+			let validInput = true;
+			if (!newFname.match("^[a-zA-Z]+([ -]?[a-zA-Z]){0,99}$")) {
+				p.innerHTML = "Enter valid first name.";
+				validInput = false;
+			}
+			if (!newLname.match("^[a-zA-Z]+([ -]?[a-zA-Z]){0,99}$")) {
+				p.innerHTML = p.innerHTML + "<br>" + "Enter a valid last name.";
+				validInput = false;
+			}
+			if (!newEmail.match("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+				p.innerHTML = p.innerHTML + "<br>"
+						+ "Enter a valid email address.";
+				validInput = false;
+			}
+			if (validInput) {
+				
+				
+				let xhr = new XMLHttpRequest();
+				let url = "http://localhost:8080/Project1/api/user/updateUser";
+				xhr.open("POST", url);
+				xhr.setRequestHeader("Content-Type",
+						"application/x-www-form-urlencoded");
+				let requestBody = `firstName=${newFname}&lastName=${newLname}&email=${newEmail}`;
+				
+				xhr.send(requestBody);
+				
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.status == 200) {						
+						p.style.color = "#222222";							
+						document.getElementById('message').innerHTML = 'Profile updated!';
+					} else if (xhr.readyState == 4) {
+						document.getElementById('message').innerHTML = 'Profile not updated !';
+					}
+				}
+			}
+		}
+		function resetForm() {
+			document.getElementById("message").innerHTML = "";
+			editButton.style.visibility = "visible";
+			submitButton.style.visibility = "hidden";
+			cancelButton.style.visibility = "hidden";
+			
+			document.getElementById("fname").style.border = "none";
+			document.getElementById("lname").style.border = "none";
+			document.getElementById("email").style.border = "none";
+			document.getElementById("fname").value = fname;
+			document.getElementById("lname").value = lname;
+			document.getElementById("email").value = email;
+			document.getElementById("fname").readOnly = true;
+			document.getElementById("lname").readOnly = true;
+			document.getElementById("email").readOnly = true;
+		}		
+	</script>
+
+</body>
+</html>

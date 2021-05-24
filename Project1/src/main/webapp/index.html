@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="static/css/style.css" />
+<style>
+html {
+	min-height: 100%
+}
+
+body {
+	background-image: url("static/img/businessWoman-home.jpg");
+	background-repeat: no-repeat;
+	background-size: cover;
+	min-height: 100vh;
+	
+	margin: 0px;
+}
+
+h1 {
+	margin-top: 5%;
+	margin-left: 0%;
+	margin-right: 10%;
+	color: #111155;
+	background-color: #ffffffaa;
+	padding: 5% 5% 5% 10%;
+	border-radius: 0px 10px 10px 0px;
+}
+
+.flexbox-container {
+	display: flex;
+}
+
+.flexbox-item-1 {
+	flex: 3;
+}
+
+.flexbox-item-2 {
+	flex: 2;
+	background-color: #ffffff66;
+	box-shadow: -10px 0px 20px #aaaaaa;	
+}
+
+img {
+	margin-top: 10%;
+	margin-left: 10%;
+	max-width: 50%;
+}
+
+p {
+	margin-top: 15%;
+	margin-left: 10%;
+	font-family: Helvetica;
+	font-size: 20px;
+}
+
+a {
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius: 3px;
+}
+</style>
+</head>
+
+<body class="flexbox-container">
+
+	<div class="flexbox-item flexbox-item-1"></div>
+	<div class="flexbox-item flexbox-item-2">
+		<img src="static/img/logo.png">
+		<h1>Welcome to the Employee Reimbursement System (ERS)</h1>		
+		<p><a href = "http://localhost:8080/Project1/login">Enter here</a></p>
+
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="static/css/style.css" />
+
+<style>
+div {
+margin-left:10%;
+width:50%;	
+}
+
+a {
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius: 3px;
+}
+</style>
+</head>
+<body>
+
+	<h3>Request reimbursement</h3>
+	<br>
+	
+	<div>
+		<p id="message"></p>
+		<label>Expense Type: </label> <br> <select name="expense-type"
+			id="types" required>
+			<option value="placeholder" selected disabled>--Please
+				choose an option--</option>
+			<option value="lodging">LODGING</option>
+			<option value="travel">TRAVEL</option>
+			<option value="food">FOOD</option>
+			<option value="other">OTHER</option>
+
+		</select> <br> <br> <label>Description: </label> <br>
+		<textarea name="description" id="desc"
+			placeholder="The description of the expense goes here." rows=4
+			cols=30></textarea>
+
+		<br> <br> <label>Expense Amount: </label> <br> <input
+			type="text" id="amt" placeholder="Ex: 12.34"> <br> <br>
+
+		<button type='submit' class="secondary-button" id="clear">Clear
+			Form</button>
+		<span>&nbsp;</span>
+
+		<button type='submit' class="primary-button" id="submit">Request
+			reimbursement</button>
+	</div>
+	<br>
+	<div>
+	<hr>
+	<a href = "http://localhost:8080/Project1/home">&#10094; Return home</a>
+	</div>
+	<script>
+		document.getElementById("submit").addEventListener("click",
+				createReimbursement);
+		document.getElementById("clear").addEventListener("click", clearForm);
+
+		function createReimbursement() {
+			let expenseType = document.getElementById("types").value;			
+			let description = document.getElementById("desc").value;			
+			let amount = document.getElementById("amt").value;
+			
+			let validInput = true;
+			let p = document.getElementById("message");
+			p.innerHTML = "";
+			p.style.color = "red";
+			if (expenseType == "placeholder") {
+				p = document.getElementById("message");
+				p.innerHTML = "Choose a valid expense type.";
+				validInput = false;
+			}
+			if (description == "") {
+				p = document.getElementById("message");
+
+				p.innerHTML = p.innerHTML + "<br>"
+						+ "Enter a valid description.";
+				validInput = false;
+
+			}
+			if (!amount.match(/^[0-9]+\.[0-9]{2}$/)) {
+				p = document.getElementById("message");
+				p.innerHTML = p.innerHTML = p.innerHTML + "<br>"
+						+ "Enter a valid amount.";
+				validInput = false;
+			}
+			if (validInput) {
+				let xhr = new XMLHttpRequest();
+				let url = "http://localhost:8080/Project1/api/reimbursement/createReimbrusement";
+				xhr.open("POST", url);
+
+				xhr.setRequestHeader("Content-Type",
+						"application/x-www-form-urlencoded");
+				let requestBody = `type=${expenseType}&description=${description}&amount=${amount}`;
+				xhr.send(requestBody);
+
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4 && xhr.status == 200) {
+						
+						p.style.color = "#222222";						
+						clearForm();
+						document.getElementById('message').innerHTML = 'Reimbursement request sent!';
+					} else if (xhr.readyState == 4) {
+						document.getElementById('message').innerHTML = 'Reimbursement request not added !';
+					}
+				}
+			}
+		}
+
+		function clearForm() {
+			let p = document.getElementById("message");
+			p.innerHTML = "";
+			document.getElementById("types").value = "placeholder";
+			document.getElementById("desc").value = '';
+			document.getElementById("amt").value = "";
+
+		}
+	</script>
+
+</body>
+</html>

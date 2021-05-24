@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="static/css/style.css" />
+
+<style>
+
+img {
+	
+	margin-top: 1%;
+	margin-left: 2%;
+	max-width: 250px;
+}
+
+.container {
+	display: flex;
+}
+
+.container-item-1 {
+	flex: 1;
+	margin-left: 10%;
+	margin-right: 1%;
+}
+
+a.new-link {
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius: 3px;
+}
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;	
+	visibility: hidden;
+	background-color: #28282f99;
+	display: flex;
+	justify-content: center;	
+	flex-direction: column;
+	min-height: 100vh;
+	width: 100%;
+}
+
+.container-item-m {
+	margin-left: auto;
+	margin-right: auto;
+	width: 60%;
+	background-color: #f8f8ff;
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+#top-modal-div {
+	padding-top: 2px;
+	border-radius: 12px 12px 0px 0px;
+}
+
+#bottom-modal-div {
+	padding-bottom: 20px;
+	border-radius: 0px 0px 12px 12px;
+}
+</style>
+</head>
+<body>
+
+	<div class="">
+		<img src="static/img/logo.png">
+	</div>
+	<br>
+	<div>
+		<nav>
+			<a class="active-nav">Home</a> <a
+				href="http://localhost:8080/Project1/resolvedReimbursements">Resolved
+				Reimbursements</a> <a href="http://localhost:8080/Project1/viewEmployees">View
+				All Employees</a> <a id='logout-nav' href=''>Logout</a>
+		</nav>
+	</div>
+	<div>
+		<h2>Manager Home page</h2>
+
+		<p id="users-name"></p>
+	</div>
+
+	<div class="container">
+		<div class="container-item-1">
+			<h3>Pending Reimbursements</h3>
+		
+			<div id="pending-list">
+				<p id="empty-pending">There are no pending requests</p>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- modal begins here -->
+	<div class="modal" id="modal-div">
+		<div class="container-item-m" id="top-modal-div">
+			<h3 style="padding-left: 2%;">Resolve Reimbursements</h3>
+		</div>
+
+
+		<div class="container-item-m">
+			<h4>Reimbursement details</h4>
+		</div>
+		<div class="container-item-m">
+			<table id="employee-info">
+				<tr>
+					<th>Employee ID</th>
+					<th style="min-width: 160px;">Employee Name</th>
+					<th>Email</th>
+				</tr>
+			</table>
+			<br> <br>
+			<table id="reimbursement-info">
+				<tr>
+					<th>Request Date</th>
+					<th>Type</th>
+					<th style="min-width: 160px;">Description</th>
+					<th>Amount</th>
+				</tr>
+			</table>
+			<br>
+		</div>
+		<div class="container-item-m" style="width: 60%; text-align: right;">
+			<br>
+
+			<button type='submit' class="secondary-button" id="deny-button">Deny</button>
+			<span style="padding-left: 12px;"></span>
+
+			<button type='submit' class="primary-button" id="approve-button">Approve</button>
+
+			<p id="message">&nbsp;</p>
+
+		</div>
+
+
+		<div class="container-item-m" id="bottom-modal-div">
+			<hr>
+			<a class="new-link" id="close-button"
+				href="http://localhost:8080/Project1/home">Close</a>
+		</div>
+	</div>
+
+	<script>
+	let logout = document.getElementById('logout-nav');
+		logout.addEventListener("click", logoutApp);
+		let closeButton = document.getElementById("close-button");
+		closeButton.addEventListener("click", closeModal);
+		document.getElementById("approve-button").addEventListener("click",updateReimbursementRequest);
+		document.getElementById("deny-button").addEventListener("click",updateReimbursementRequest);
+		
+		let pendingReimbursementResponse;// holds the response for the reimbursements
+		let selectedReimbursementId;//stores the id of the reimburementrequet selected;
+		loadUserInfo();
+
+	
+		function loadUserInfo() {
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/api/user"
+			xhr.open("GET", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					let response = xhr.responseText;
+					response = JSON.parse(response);
+
+					populateUserInfo(response);
+				}
+			}
+
+			let xhr1 = new XMLHttpRequest();
+			let url1 = "http://localhost:8080/Project1/api/reimbursement/allPendingReimbursements"
+			xhr1.open("GET", url1);
+			xhr1.send();
+			xhr1.onreadystatechange = function() {
+				if (xhr1.readyState == 4 && xhr1.status == 200) {
+					pendingReimbursementResponse = xhr1.responseText;
+					pendingReimbursementResponse = JSON
+							.parse(pendingReimbursementResponse);
+					
+					populatePendingReimbursements(pendingReimbursementResponse);
+				}
+			}
+		}
+
+		function populateUserInfo(response) {
+			let usersName = document.getElementById("users-name");
+			usersName.innerHTML = "Welcome " + response.firstName + " "
+					+ response.lastName;
+		}
+
+		function populatePendingReimbursements(response) {
+
+			let tableDiv = document.getElementById("pending-list");
+			let table = document.createElement('table');
+			let rows = response.length;
+			if (rows > 0) {
+				let p = document.getElementById("empty-pending");
+				tableDiv.removeChild(p);
+				let cols = 6;
+				let headings = [ "DATE", "AMT", "DESCRIPTION", "EMPLOYEE ID",
+						"TYPE", "" ];
+				let tr = document.createElement('tr');
+				for (let i = 0; i < cols; i++) {
+					let th = document.createElement('th');
+					if (i == (cols - 1)) {
+						th.style.borderBottom = "inherit";
+						th.style.backgroundColor = "inherit";
+						th.style.border = "none";
+					}
+					th.innerHTML = headings[i];
+					tr.appendChild(th);
+				}
+				table.appendChild(tr);
+				for (let i = 0; i < rows; i++) {
+					tr = document.createElement('tr');
+
+					let td = document.createElement('td');
+					td.innerHTML = new Date(response[i].submittedTime)
+							.toLocaleDateString();
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].amount;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].description;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].author;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].reimbType;
+					tr.appendChild(td);
+
+					let td1 = document.createElement('td');
+					let button = document.createElement("BUTTON");
+					button.setAttribute("id", "" + i);
+					button.className = "secondary-button";
+					button.addEventListener("click", openModal);
+
+					button.innerHTML = "Approve/Deny &#10095;";
+					td1.style.padding = "10px";
+					td1.style.backgroundColor = "inherit";
+					td1.style.border = "none";
+					td1.appendChild(button);
+					tr.appendChild(td1);
+
+					table.appendChild(tr);
+				}
+				tableDiv.appendChild(table);
+
+			}
+		}
+
+		function closeModal() {
+			document.getElementById("modal-div").style.visibility = "hidden";
+		}
+
+		function openModal() {
+			document.getElementById("modal-div").style.visibility = "visible";
+			let buttonId = document.activeElement.id;
+			
+			let userId = pendingReimbursementResponse[parseInt(buttonId, 10)].author;
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/api/users/" + userId;
+			xhr.open("GET", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					let response = xhr.responseText;
+					response = JSON.parse(response);
+					
+					populateModalUserInfo(response);
+					populateModalReimbursement(parseInt(buttonId, 10));
+					document.getElementById("approve-button").disabled = false;
+					document.getElementById("deny-button").disabled = false
+					
+				} else if (xhr.readyState == 4) {
+					
+					let p = document.getElementById("message");
+					p.innerHTML = "";
+					p.innerHTML = "Could not load information";
+					document.getElementById("approve-button").disabled = true;
+					document.getElementById("deny-button").disabled = true;
+
+				}
+			}
+
+		}
+
+		function populateModalUserInfo(response) {
+			let table = document.getElementById('employee-info');
+
+			let tr = document.createElement('tr');
+
+			let td = document.createElement('td');
+
+			td.innerHTML = response.id;
+			tr.appendChild(td);
+
+			td = document.createElement('td');
+			td.innerHTML = response.firstName + " " + response.lastName;
+			tr.appendChild(td);
+
+			td = document.createElement('td');
+			td.innerHTML = response.email;
+			tr.appendChild(td);
+
+			tr.appendChild(td);
+
+			table.appendChild(tr);
+
+		}
+
+		function populateModalReimbursement(buttonId) {
+
+			let table = document.getElementById('reimbursement-info');
+
+			let tr = document.createElement('tr');
+
+			let td = document.createElement('td');
+			td.innerHTML = new Date(
+					pendingReimbursementResponse[buttonId].submittedTime)
+					.toLocaleDateString();
+			tr.appendChild(td);
+
+			td = document.createElement('td');
+			td.innerHTML = pendingReimbursementResponse[buttonId].amount;
+			tr.appendChild(td);
+
+			td = document.createElement('td');
+			td.innerHTML = pendingReimbursementResponse[buttonId].description;
+			tr.appendChild(td);
+
+			td = document.createElement('td');
+			td.innerHTML = pendingReimbursementResponse[buttonId].reimbType;
+			tr.appendChild(td);
+
+			tr.appendChild(td);
+
+			table.appendChild(tr);
+
+			selectedReimbursementId = pendingReimbursementResponse[buttonId].id;
+		}
+
+		function updateReimbursementRequest() {
+			let status = "pending"
+			if (document.activeElement.id == "approve-button") {
+				status = "approved"
+			} else if (document.activeElement.id == "deny-button") {
+				status = "denied"
+			}
+			
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/api/reimbursement/updateReimbursement";
+			xhr.open("POST", url);
+
+			xhr.setRequestHeader("Content-Type",
+					"application/x-www-form-urlencoded");
+			let requestBody = `id=${selectedReimbursementId}&status=${status}`;
+			xhr.send(requestBody);
+
+			xhr.onreadystatechange = function() {
+				
+				let p = document.getElementById('message');
+				if (xhr.readyState == 4 && xhr.status == 200) {
+
+										
+					p.style.color = "#222222";					
+					p.innerHTML = 'Reimbursement request resolved!';
+				} else if (xhr.readyState == 4) {
+					p.style.color = "red";
+					p.innerHTML = 'Reimbursement request not resolved!';
+				}
+			}
+		}
+		
+		function logoutApp() {
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/login"
+			xhr.open("DELETE", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					window.location.href = "http://localhost:8080/Project1/";
+
+				}
+			}
+		}
+		
+		
+	</script>
+
+</body>
+</html>

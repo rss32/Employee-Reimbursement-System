@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/style.css" />
+<style>
+
+.container {
+	display: flex;
+	flex-direction: column;	
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	align-items: center;
+}
+
+.container-item-1 {	
+	max-height: 350px;
+}
+
+.container-item-2 {	
+	text-align: center;
+}
+
+.message {
+	font-size: 20px;
+	font-family: Helvetica, sans-serif;
+}
+
+.container-item-1 img {
+	max-width: 350px;
+}
+
+a {
+	
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius:3px;
+	font-size: 20px;
+}
+</style>
+</head>
+<body>
+
+	<div class="container">
+		<div class="container-item-1">
+			<img src="../static/img/404Error.png">
+		</div>
+		<div class="container-item-2">
+			<p class="message">The page you are looking for cannot be found.</p>
+			<a href="http://localhost:8080/Project1/home"> Return to home page </a>
+
+		</div>
+	</div>
+
+</body>
+
+</html>

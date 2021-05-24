@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="static/css/style.css" />
+
+<style>
+img {
+	margin-top: 1%;
+	margin-left: 2%;
+	max-width: 250px;
+}
+
+.container {
+	display: flex;
+}
+
+.container-item-1 {
+	flex: 1;
+	margin-left: 10%;
+	margin-right: 1%;
+}
+
+a.new-link {
+	padding: 5px 20px 5px;
+	text-decoration: none;
+	border: 2px solid steelblue;
+	background-color: steelblue;
+	color: white;
+	border-radius: 3px;
+}
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	visibility: hidden;
+	background-color: #28282f99;
+	display: flex;
+	justify-content: center;	
+	flex-direction: column;
+	min-height: 100vh;
+	width: 100%;
+	z-index: 1;
+}
+
+.container-item-m {
+	margin-left: auto;
+	margin-right: auto;
+	width: 60%;
+	background-color: #f8f8ff;
+	padding-left: 2%;
+	padding-right: 2%;
+}
+
+#top-modal-div {
+	padding-top: 2px;
+	border-radius: 12px 12px 0px 0px;
+}
+
+#bottom-modal-div {
+	padding-bottom: 20px;
+	border-radius: 0px 0px 12px 12px;
+}
+</style>
+</head>
+<body>
+
+	<div class="">
+		<img src="static/img/logo.png">
+	</div>
+	<br>
+	<div>
+		<nav>
+			<a href="http://localhost:8080/Project1/home">Home</a> <a
+				href="http://localhost:8080/Project1/resolvedReimbursements">Resolved
+				Reimbursements</a> <a class="active-nav">View All Employees</a> <a
+				id='logout-nav' href=''>Logout</a>
+
+		</nav>
+	</div>
+	<div>
+		<h2>Employees at GCI</h2>
+
+	</div>
+
+	<div class="container">
+		<div class="container-item-1">
+			<h3>List of employees:</h3>
+
+			<div id="employee-list">
+				<p id="empty-list">There are no employees</p>
+			</div>
+
+		</div>
+	</div>
+
+	<!-- modal begins here -->
+	<div class="modal" id="modal-div">
+		<div class="container-item-m" id="top-modal-div">
+			<h3 style="padding-left: 2%;">Pending Reimbursement Requests</h3>
+		</div>
+
+
+		<div class="container-item-m">
+			<h4 id="modal-heading4">Reimbursement details</h4>
+		</div>
+		<div class="container-item-m" id="modal-table">
+			<p id="modal-message">There are no pending reimbursements for
+				this employee</p>
+			<br>
+		</div>
+		<div class="container-item-m" id="bottom-modal-div">
+			<hr>
+			<a class="new-link" id="close-button" href="">Close</a>
+		</div>
+	</div>
+
+	<script>
+		let logout = document.getElementById('logout-nav');
+		logout.addEventListener("click", logoutApp);
+		let closeButton = document.getElementById("close-button");
+		closeButton.addEventListener("click", closeModal);
+
+		let allEmployeesList;// holds the list of users from the server
+
+		getEmployees();
+		function getEmployees() {
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/api/user/allRegularUsers"
+			xhr.open("GET", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					let response = xhr.responseText;
+					allEmployeesList = JSON.parse(response);
+
+					populateUsersInfo(allEmployeesList);
+				}
+			}
+		}
+
+		function populateUsersInfo(response) {
+			let tableDiv = document.getElementById("employee-list");
+			let table = document.createElement('table');
+			let rows = response.length;
+			if (rows > 0) {
+				let p = document.getElementById("empty-list");
+				tableDiv.removeChild(p);
+				let cols = 5;
+				let headings = [ "EMPLOYEE ID", "USERNAME", "EMPLOYEE NAME",
+						"EMAIL", "" ];
+				let tr = document.createElement('tr');
+				for (let i = 0; i < cols; i++) {
+					let th = document.createElement('th');
+					if (i == (cols - 1)) {
+						th.style.borderBottom = "inherit";
+						th.style.backgroundColor = "inherit";
+						th.style.border = "none";
+					}
+					th.innerHTML = headings[i];
+					tr.appendChild(th);
+				}
+				table.appendChild(tr);
+				for (let i = 0; i < rows; i++) {
+					tr = document.createElement('tr');
+
+					let td = document.createElement('td');
+					td.innerHTML = response[i].id;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].username;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].firstName + " "
+							+ response[i].lastName;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].email;
+					tr.appendChild(td);
+
+					let td1 = document.createElement('td');
+					let button = document.createElement("BUTTON");
+					button.setAttribute("id", "" + i);
+					button.className = "secondary-button";
+					button.addEventListener("click", openModal);
+
+					button.innerHTML = " Open Reimb. reqs &#10095;";
+					td1.style.padding = "10px";
+					td1.style.backgroundColor = "inherit";
+					td1.style.border = "none";
+					td1.appendChild(button);
+					tr.appendChild(td1);
+
+					table.appendChild(tr);
+				}
+				tableDiv.appendChild(table);
+			}
+		}
+		function openModal() {
+			document.getElementById("modal-div").style.visibility = "visible";
+			let buttonId = parseInt(document.activeElement.id, 10);
+
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/api/reimbursements/pendingReimbursements/?user="
+					+ allEmployeesList[buttonId].id;
+			xhr.open("GET", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4 && xhr.status == 200) {
+					let response = xhr.responseText;
+					response = JSON.parse(response);
+
+					let heading = document.getElementById("modal-heading4");
+					heading.innerHTML = "Reimbursement details for "
+							+ allEmployeesList[buttonId].firstName + " "
+							+ allEmployeesList[buttonId].lastName;
+
+					populateModalReimbursementList(response);
+
+				} else if (xhr.readyState == 4) {
+
+					let p = document.getElementById("modal-message");
+					p.innerHTML = "";
+					p.innerHTML = "Could not load information";
+
+				}
+			}
+
+		}
+
+		function closeModal() {
+			document.getElementById("modal-div").style.visibility = "hidden";
+		}
+
+		function populateModalReimbursementList(response) {
+			let tableDiv = document.getElementById("modal-table");
+			let table = document.createElement('table');
+			let rows = response.length;
+			if (rows > 0) {
+				let p = document.getElementById("modal-message");
+				tableDiv.removeChild(p);
+				let cols = 4;
+				let headings = [ "DATE", "AMT", "DESCRIPTION", "TYPE" ];
+				let tr = document.createElement('tr');
+				for (let i = 0; i < cols; i++) {
+					let th = document.createElement('th');
+
+					th.innerHTML = headings[i];
+					tr.appendChild(th);
+				}
+				table.appendChild(tr);
+				for (let i = 0; i < rows; i++) {
+					tr = document.createElement('tr');
+
+					let td = document.createElement('td');
+					td.innerHTML = new Date(response[i].submittedTime)
+							.toLocaleDateString();
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].amount;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].description;
+					tr.appendChild(td);
+
+					td = document.createElement('td');
+					td.innerHTML = response[i].reimbType;
+					tr.appendChild(td);
+
+					table.appendChild(tr);
+				}
+				tableDiv.appendChild(table);
+			}
+		}
+
+		function logoutApp() {
+			let xhr = new XMLHttpRequest();
+			let url = "http://localhost:8080/Project1/login"
+			xhr.open("DELETE", url);
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState == 4) {
+					window.location.href = "http://localhost:8080/Project1/";
+
+				}
+			}
+		}
+	</script>
+</body>
+</html>

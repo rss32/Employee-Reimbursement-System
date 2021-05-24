@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" href="static/css/style.css" />
+
+<style>
+.container {
+	display: flex;
+	flex-direction: column;
+	position: fixed;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	align-items: center;
+}
+
+.container-item-2 {
+	border: 2px solid dimgray;
+	padding: 20px 20px 1px;
+	border-radius: 7.5px;
+	box-shadow: 0px 0px 5px 2px silver;
+}
+
+.primary-button {
+	display: block;
+	margin: auto;
+}
+
+#number {
+	text-align: center;
+	 display : block;
+	 width:17%;
+	margin: auto;
+	box-shadow: 0px 0px 5px 2px silver;
+	display: block;
+	border-radius:14px;
+	padding:5px;
+	visibility:hidden;
+}
+</style>
+
+</head>
+<body>
+	<div class="container">
+		<div class="container-item-1">
+			<h3>Login to the ERS</h3>
+			<br>
+		</div>
+		<div class="container-item-2">
+			<form action="http://localhost:8080/Project1/home" method="POST">
+				<label>Username: </label> <br> <input type="text"
+					name="username" placeholder="Username" required> <br> <br>
+				<label>Password: </label> <br> <input type="password"
+					name="password" placeholder="Password" required> <br> <br>
+
+				<button type='submit' class="primary-button">Log in</button>
+				<br>
+			</form>
+		</div>
+		<br>
+		<div class="container-item-3">
+			<button type='submit' class="secondary-button"
+				id="random-number-button">Random number</button>
+			<br><br>
+			<p id="number"></p>
+		</div>
+	</div>
+	<script>
+		let button = document.getElementById("random-number-button");
+		button.addEventListener("click", showRandomInt);
+		function showRandomInt() {
+			let number = Math.floor(Math.random() * 69);
+			
+			let p = document.getElementById("number");
+			p.style.visibility ="visible";
+			p.innerHTML = number;
+		}
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,102 @@
+body {
+	background-color:#f8f8ff;
+	font-family: Helvetica;
+	color: #303030;
+}
+
+.container{
+	display:flex;
+}
+
+
+
+/*Styling for all buttons*/
+
+button.primary-button{
+	border-style: solid;
+	border-color: orange;
+	border-radius: 5px;
+	background-color: darkorange;
+	padding: 3px 15px 3px;		
+	color: lightyellow;	
+	box-shadow: 0px 0px 3px dimgray;
+	font-size:14px;
+}
+
+button.primary-button:active {
+	color: palegoldenrod;
+	box-shadow: 0px 0px;	
+}
+
+button.secondary-button{
+	border-style: solid;
+	border-color: darkgray;
+	border-radius: 5px;	
+	background-color: gainsboro;	
+	padding: 3px 15px 3px;	
+	color: gray;	
+	box-shadow: 0px 0px 2px darkgray;
+	font-size:14px;
+}
+
+button.secondary-button:active {
+	color: dimgray;
+	box-shadow: 0px 0px -0px -1px ;	
+}
+
+/*styling for all tables*/
+table {
+	border-collapse: collapse;	
+}
+
+table th {
+	background-color: lightblue;
+	padding: 16px;
+	color: #303030;
+	border: 1px solid lightblue;
+	border-bottom: 2px solid blue;
+}
+
+table td {
+	background-color: azure;
+	border: 1px solid lightblue;
+}
+
+/*styling for navigation*/
+
+nav{
+	border-bottom: 2px solid dimgray;
+	padding-bottom: 3px;
+}
+
+nav	a {
+	color: inherit;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top:3px;
+	padding-bottom:4px;
+	text-decoration: none;
+	background-color: lightgray;
+	border: 2px solid dimgray;
+	border-radius:4px 4px 0px 0px;
+	
+}
+
+nav  a.active-nav {
+	
+	
+	border:2px solid dimgray;
+	border-bottom: 2px solid #f8f8ff;	
+	background-color: #f9f9f9;	
+	color: #6969df;
+	
+}
+#logout-nav{
+	
+	float:right;	
+	margin:-5px 15px;
+	padding-bottom: 3px;	
+	background-color :orange;
+	
+	
+}	
