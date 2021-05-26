@@ -12,7 +12,7 @@ Expense Reimbursement System (ERS) will manage the process of reimbursing employ
 - Log4j 2.14.1
 - Maven 3.63
 - Apache tomcat 8.5.63
-- PostreSQL 10.16
+- PostgreSQL 10.16
 - Javax servlet API 4.0.1
 - JUnit 5.7
 - Tomcat-Catalina 9.0.45
