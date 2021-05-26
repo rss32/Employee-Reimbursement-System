@@ -5,7 +5,7 @@ Expense Reimbursement System (ERS) will manage the process of reimbursing employ
 
 ---
 
-### Technologies used
+### Technologies & Languages used
 - Java 8              
 - JDBC
 - Jackson Databind 2.12.3         
@@ -16,6 +16,9 @@ Expense Reimbursement System (ERS) will manage the process of reimbursing employ
 - Javax servlet API 4.0.1
 - JUnit 5.7
 - Tomcat-Catalina 9.0.45
+- JavaScript
+- CSS
+- HTML
 
 ### Features
 - The user can view their pending and resolved reimbursement requests
